@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دعوة خطوبة محمد وأسماء</title>
+<link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#c9a96e;--gold-light:#e8d5b0;--rose:#d4896a;
+  --cream:#fdf6f0;--text-dark:#5a3e35;--text-mid:#8a6558;--text-light:#b89890;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow-x:hidden;}
+body{font-family:"Tajawal",sans-serif;background:#0f0805;}
+
+#stars-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* ===== SPLASH SCREEN ===== */
+#splash{
+  position:fixed;inset:0;z-index:100;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 40%, #2a1508 0%, #0f0805 70%);
+  cursor:pointer;overflow:hidden;
+}
+
+/* particles */
+.spark{
+  position:absolute;border-radius:50%;pointer-events:none;
+  animation:sparkFloat linear infinite;opacity:0;
+}
+@keyframes sparkFloat{
+  0%{opacity:0;transform:translateY(0) scale(0);}
+  20%{opacity:1;transform:translateY(-30px) scale(1);}
+  80%{opacity:0.6;}
+  100%{opacity:0;transform:translateY(-120px) scale(0.3);}
+}
+
+/* ring ornament */
+.splash-ring{
+  width:min(260px,70vw);height:min(260px,70vw);
+  position:relative;margin-bottom:2rem;
+  animation:ringPulse 3s ease-in-out infinite;
+}
+@keyframes ringPulse{
+  0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px rgba(201,169,110,0.4));}
+  50%{transform:scale(1.03);filter:drop-shadow(0 0 40px rgba(201,169,110,0.7));}
+}
+.splash-ring svg{width:100%;height:100%;}
+
+.ring-inner{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:20px;
+}
+.splash-bism{
+  font-family:"Scheherazade New",serif;font-size:clamp(0.85rem,2.5vw,1rem);
+  color:rgba(232,213,176,0.8);margin-bottom:6px;letter-spacing:1px;
+}
+.splash-names{
+  font-family:"Scheherazade New",serif;font-size:clamp(1.6rem,5vw,2rem);
+  font-weight:700;color:#f0ddb0;
+  text-shadow:0 0 30px rgba(201,169,110,0.8);line-height:1.3;
+}
+.splash-heart{font-size:1.4rem;display:block;margin:4px 0;animation:hb 1.5s ease infinite;}
+@keyframes hb{0%,100%{transform:scale(1);}50%{transform:scale(1.2);}}
+
+.splash-label{
+  font-size:clamp(0.75rem,2vw,0.85rem);
+  color:rgba(201,169,110,0.7);letter-spacing:4px;
+  margin-bottom:2.5rem;font-weight:300;
+}
+
+.enter-btn{
+  position:relative;overflow:hidden;
+  padding:1rem 3rem;border-radius:50px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#c9a96e,#a07828,#c9a96e);
+  background-size:200% 100%;
+  color:#1a0e08;font-family:"Tajawal",sans-serif;
+  font-size:1.05rem;font-weight:700;letter-spacing:2px;
+  box-shadow:0 0 0 1px rgba(201,169,110,0.3),0 8px 30px rgba(201,169,110,0.35);
+  animation:btnShimmer 3s ease infinite, btnGlow 2s ease infinite;
+  transition:transform 0.2s;
+}
+.enter-btn:active{transform:scale(0.96);}
+@keyframes btnShimmer{0%{background-position:100% 0;}100%{background-position:-100% 0;}}
+@keyframes btnGlow{
+  0%,100%{box-shadow:0 0 0 1px rgba(201,169,110,0.3),0 8px 30px rgba(201,169,110,0.35);}
+  50%{box-shadow:0 0 0 2px rgba(201,169,110,0.5),0 12px 45px rgba(201,169,110,0.6);}
+}
+.btn-shimmer{
+  position:absolute;top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);
+  animation:shimmerMove 2.5s ease infinite;
+}
+@keyframes shimmerMove{0%{left:-100%;}100%{left:200%;}}
+
+/* splash exit */
+#splash.exiting{animation:splashExit 1s ease forwards;}
+@keyframes splashExit{
+  0%{opacity:1;transform:scale(1);}
+  40%{opacity:1;transform:scale(1.04);}
+  100%{opacity:0;transform:scale(0.92);pointer-events:none;}
+}
+
+/* ===== INVITE ===== */
+#invite{
+  display:none;min-height:100vh;position:relative;
+  background:transparent;
+}
+#invite.visible{display:block;}
+@keyframes bgShift{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+
+.orb{position:fixed;border-radius:50%;filter:blur(70px);opacity:0.12;z-index:1;animation:orbDrift ease-in-out infinite;pointer-events:none;}
+@keyframes orbDrift{0%,100%{transform:translate(0,0);}50%{transform:translate(25px,-20px);}}
+
+.float-petal{position:fixed;pointer-events:none;z-index:2;animation:petalFloat linear infinite;opacity:0;}
+@keyframes petalFloat{0%{transform:translateY(-60px) rotate(0deg);opacity:0;}8%{opacity:0.9;}90%{opacity:0.3;}100%{transform:translateY(105vh) rotate(420deg);opacity:0;}}
+
+.content-wrap{position:relative;z-index:2;max-width:620px;margin:0 auto;padding:2rem 1.2rem 7rem;}
+
+.card-enter{opacity:0;animation:cardIn 0.9s ease forwards;}
+@keyframes cardIn{from{opacity:0;transform:translateY(40px) scale(0.96);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+.invite-header{text-align:center;margin-bottom:1.5rem;}
+.bismillah{font-family:"Scheherazade New",serif;font-size:1.7rem;color:var(--gold);margin-bottom:0.8rem;}
+.divider-orn{display:flex;align-items:center;gap:1rem;justify-content:center;margin:0.8rem 0;color:var(--gold);font-size:1rem;letter-spacing:8px;}
+.divider-orn::before,.divider-orn::after{content:"";flex:1;height:1px;background:linear-gradient(to right,transparent,var(--gold-light),transparent);}
+
+.glass{background:rgba(255,255,255,0.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.9);box-shadow:0 8px 40px rgba(0,0,0,0.15),inset 0 1px 0 rgba(255,255,255,0.95);}
+
+
+/* hero name overlay */
+.hero-names{
+  text-align:center;padding:3rem 1rem 1.5rem;position:relative;z-index:2;
+}
+.hero-title{
+  font-size:0.78rem;color:rgba(232,213,176,0.8);letter-spacing:5px;
+  margin-bottom:0.8rem;font-weight:300;
+}
+.hero-name-row{
+  display:flex;align-items:center;justify-content:center;gap:0.8rem;margin-bottom:0.5rem;
+}
+.hero-name{
+  font-family:"Scheherazade New",serif;
+  font-size:clamp(2.2rem,8vw,3.2rem);
+  font-weight:700;color:white;
+  text-shadow:0 0 40px rgba(201,169,110,0.6),0 2px 20px rgba(0,0,0,0.8);
+}
+.hero-heart{font-size:2rem;animation:hb 1.8s ease infinite;display:inline-block;filter:drop-shadow(0 0 10px rgba(212,137,106,0.8));}
+.hero-divider{
+  display:flex;align-items:center;gap:1rem;justify-content:center;
+  color:rgba(201,169,110,0.7);font-size:0.9rem;letter-spacing:6px;margin-top:0.5rem;
+}
+.hero-divider::before,.hero-divider::after{content:"";flex:1;max-width:80px;height:1px;background:linear-gradient(to right,transparent,rgba(201,169,110,0.6),transparent);}
+
+/* couple card */
+.couple-card{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+}
+.couple-img{
+  width:100%;height:100%;object-fit:cover;object-position:top center;display:block;
+  filter:brightness(0.45) saturate(0.85);
+}
+.couple-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(
+    to bottom,
+    rgba(15,8,5,0.55) 0%,
+    rgba(15,8,5,0.15) 30%,
+    rgba(15,8,5,0.1) 55%,
+    rgba(15,8,5,0.7) 100%
+  );
+}
+.couple-names-overlay{display:flex;align-items:center;justify-content:center;gap:0.6rem;}
+.co-name{font-family:"Scheherazade New",serif;font-size:clamp(1.8rem,6vw,2.5rem);font-weight:700;color:white;text-shadow:0 2px 15px rgba(0,0,0,0.5);}
+.co-heart{font-size:1.6rem;animation:hb 1.8s ease infinite;display:inline-block;}
+
+/* main card */
+.invite-card{border-radius:28px;padding:2rem 1.8rem;text-align:center;margin-bottom:1.2rem;position:relative;overflow:hidden;}
+.invite-card::before{content:"";position:absolute;top:-80px;right:-80px;width:220px;height:220px;background:radial-gradient(circle,rgba(232,180,160,0.2),transparent 70%);border-radius:50%;pointer-events:none;}
+.with-joy{font-size:0.85rem;color:var(--text-light);letter-spacing:4px;margin-bottom:0.8rem;}
+.main-text{font-size:1rem;color:var(--text-mid);line-height:2;font-weight:300;}
+
+/* details */
+.details-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem;}
+.detail-card{border-radius:18px;padding:1.3rem 1rem;text-align:center;transition:transform 0.3s;}
+.detail-card:hover{transform:translateY(-4px);}
+.detail-icon{font-size:2rem;margin-bottom:0.4rem;display:block;}
+.detail-label{font-size:0.72rem;color:var(--text-light);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.3rem;}
+.detail-value{font-size:0.95rem;color:var(--text-dark);font-weight:600;line-height:1.4;}
+.detail-value.date-num{font-family:"Scheherazade New",serif;font-size:1.3rem;color:var(--rose);}
+
+/* location */
+.location-card{border-radius:20px;overflow:hidden;margin-bottom:1.2rem;background:linear-gradient(135deg,rgba(184,201,176,0.35),rgba(232,180,160,0.25));border:1px solid rgba(138,170,128,0.3);}
+.location-top{padding:1.5rem;text-align:center;}
+.place-name{font-family:"Scheherazade New",serif;font-size:1.7rem;color:var(--text-dark);margin:0.3rem 0;}
+.place-sub{font-size:0.9rem;color:var(--text-mid);font-weight:300;margin-bottom:1rem;}
+.map-btn{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  padding:0.7rem 1.8rem;border-radius:50px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#4285f4,#1a73e8);
+  color:white;font-family:"Tajawal",sans-serif;font-size:0.9rem;font-weight:600;
+  box-shadow:0 4px 15px rgba(66,133,244,0.4);transition:transform 0.2s;text-decoration:none;
+}
+.map-btn:hover{transform:translateY(-2px);}
+
+/* countdown */
+.countdown-card{border-radius:24px;padding:1.8rem 1.5rem;text-align:center;margin-bottom:1.2rem;}
+.countdown-title{font-size:0.85rem;color:var(--gold);letter-spacing:3px;margin-bottom:1.2rem;font-weight:500;}
+.countdown-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.8rem;}
+.count-item{display:flex;flex-direction:column;align-items:center;}
+.count-num{
+  font-family:"Scheherazade New",serif;font-size:clamp(1.8rem,5vw,2.6rem);
+  color:var(--text-dark);font-weight:700;line-height:1;
+  background:rgba(255,255,255,0.75);border-radius:14px;width:100%;padding:0.6rem 0.2rem;
+  box-shadow:0 4px 15px rgba(180,140,120,0.12);transition:all 0.3s ease;
+}
+.count-num.flip{transform:scale(1.12);color:var(--rose);}
+.count-label{font-size:0.7rem;color:var(--text-light);margin-top:0.4rem;letter-spacing:1px;}
+
+/* quran */
+.message-card{border-radius:18px;padding:1.8rem 1.5rem;text-align:center;font-family:"Scheherazade New",serif;font-size:1.12rem;color:var(--text-mid);line-height:2;font-style:italic;margin-bottom:1.2rem;}
+
+/* share */
+.share-btn{display:block;width:100%;padding:1rem;border-radius:50px;border:none;background:linear-gradient(135deg,#25d366,#128c7e);color:white;font-family:"Tajawal",sans-serif;font-size:1rem;font-weight:600;cursor:pointer;letter-spacing:1px;box-shadow:0 8px 25px rgba(37,211,102,0.35);transition:transform 0.3s;margin-bottom:1.2rem;}
+.share-btn:hover{transform:translateY(-3px);}
+
+.invite-footer{text-align:center;padding:0.5rem 0;}
+.footer-ornament{font-size:1.4rem;color:var(--gold);letter-spacing:10px;opacity:0.6;margin-bottom:0.4rem;}
+.footer-text{font-size:0.85rem;color:var(--text-light);letter-spacing:1px;}
+
+/* music bar */
+#music-bar{
+  position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);z-index:100;
+  background:rgba(255,255,255,0.88);backdrop-filter:blur(20px);
+  border:1px solid rgba(201,169,110,0.3);border-radius:50px;
+  padding:0.7rem 1.5rem;display:none;align-items:center;gap:0.8rem;
+  box-shadow:0 8px 30px rgba(180,140,120,0.2);cursor:pointer;transition:transform 0.2s;white-space:nowrap;
+}
+#music-bar:hover{transform:translateX(-50%) translateY(-3px);}
+#music-bar.visible{display:flex;}
+.music-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--gold),var(--rose));border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;flex-shrink:0;}
+.music-icon.playing{animation:spinIcon 4s linear infinite;}
+@keyframes spinIcon{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.music-title{font-size:0.75rem;font-weight:600;color:var(--text-dark);}
+.music-artist{font-size:0.65rem;color:var(--text-light);}
+.music-waves{display:flex;gap:2px;align-items:flex-end;height:20px;}
+.wave-bar{width:3px;background:linear-gradient(to top,var(--gold),var(--rose));border-radius:2px;animation:wave 0.8s ease infinite;}
+.wave-bar:nth-child(2){animation-delay:0.15s;}.wave-bar:nth-child(3){animation-delay:0.3s;}.wave-bar:nth-child(4){animation-delay:0.15s;}
+@keyframes wave{0%,100%{height:4px;}50%{height:18px;}}
+.wave-bar.paused{animation-play-state:paused;height:4px;}
+
+.confetti-piece{position:fixed;border-radius:2px;pointer-events:none;z-index:200;animation:confettiFall linear forwards;}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(110vh) rotate(720deg);opacity:0;}}
+.scatter{position:fixed;pointer-events:none;z-index:300;animation:scatterFly ease forwards;}
+@keyframes scatterFly{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-200px) scale(0.1);}}
+
+@media(max-width:400px){
+  .details-grid{grid-template-columns:1fr;}
+  .countdown-grid{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<audio id="bg-audio" loop preload="auto">
+  <source src="Albumaty.Com_hsyn_algsmy_edkhly_amry.mp3" type="audio/mpeg">
+</audio>
+
+<canvas id="stars-canvas"></canvas>
+
+<!-- ===== SPLASH ===== -->
+<div id="splash">
+  <div id="sparksWrap"></div>
+
+  <div class="splash-ring">
+    <svg viewBox="0 0 260 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- outer dashed ring -->
+      <circle cx="130" cy="130" r="124" stroke="#c9a96e" stroke-width="1" stroke-dasharray="8 5" opacity="0.5"/>
+      <!-- middle ring -->
+      <circle cx="130" cy="130" r="112" stroke="#e8d5b0" stroke-width="1.5" opacity="0.35"/>
+      <!-- inner decorative ring -->
+      <circle cx="130" cy="130" r="100" stroke="#c9a96e" stroke-width="1" stroke-dasharray="4 6" opacity="0.4"/>
+      <!-- corner diamonds on outer ring -->
+      <polygon points="130,4 134,12 130,8 126,12" fill="#c9a96e" opacity="0.9"/>
+      <polygon points="256,130 248,134 252,130 248,126" fill="#c9a96e" opacity="0.9"/>
+      <polygon points="130,256 126,248 130,252 134,248" fill="#c9a96e" opacity="0.9"/>
+      <polygon points="4,130 12,126 8,130 12,134" fill="#c9a96e" opacity="0.9"/>
+      <!-- small diamonds diagonal -->
+      <polygon points="222,38 226,44 222,41 218,44" fill="#c9a96e" opacity="0.6"/>
+      <polygon points="222,222 218,216 222,219 226,216" fill="#c9a96e" opacity="0.6"/>
+      <polygon points="38,222 44,218 41,222 44,226" fill="#c9a96e" opacity="0.6"/>
+      <polygon points="38,38 44,44 41,41 44,38" fill="#c9a96e" opacity="0.6"/>
+      <!-- floral motifs top/bottom -->
+      <text x="130" y="22" text-anchor="middle" font-size="14" fill="#c9a96e" opacity="0.7">✦</text>
+      <text x="130" y="250" text-anchor="middle" font-size="14" fill="#c9a96e" opacity="0.7">✦</text>
+      <text x="18" y="135" text-anchor="middle" font-size="14" fill="#c9a96e" opacity="0.7">✦</text>
+      <text x="244" y="135" text-anchor="middle" font-size="14" fill="#c9a96e" opacity="0.7">✦</text>
+    </svg>
+
+    <div class="ring-inner">
+      <div class="splash-bism">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+      <div style="margin:8px 0 4px;font-size:1.4rem;">💍</div>
+      <div class="splash-names">
+        محمد
+        <span class="splash-heart">💗</span>
+        أسماء
+      </div>
+    </div>
+  </div>
+
+  <div class="splash-label">دعوة خطوبة مباركة</div>
+
+  <button class="enter-btn" id="enterBtn">
+    <div class="btn-shimmer"></div>
+    ✨ افتح الدعوة ✨
+  </button>
+</div>
+
+<!-- ===== INVITE ===== -->
+<div id="invite">
+  <div class="orb" style="width:500px;height:500px;top:-150px;right:-150px;background:radial-gradient(circle,#f0c8b0,#f8e8e0);animation-duration:10s;"></div>
+  <div class="orb" style="width:400px;height:400px;bottom:-100px;left:-100px;background:radial-gradient(circle,#b8d4b0,#d8ecd8);animation-duration:13s;animation-delay:3s;"></div>
+
+  <div class="content-wrap">
+
+    <!-- hero names over image -->
+    <div class="hero-names card-enter" style="animation-delay:0.05s">
+      <div class="hero-title">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+      <div class="hero-name-row">
+        <span class="hero-name">محمد</span>
+        <span class="hero-heart">💗</span>
+        <span class="hero-name">أسماء</span>
+      </div>
+      <div class="hero-divider">❧ ✦ ❧</div>
+    </div>
+
+    <!-- صورة العروسين -->
+    <div class="couple-card card-enter" style="animation-delay:0.2s">
+      <img class="couple-img" src="couple.png" alt="محمد وأسماء">
+      <div class="couple-overlay">
+<div class="couple-names-overlay">
+          <span class="co-name">محمد</span>
+          <span class="co-heart">💗</span>
+          <span class="co-name">أسماء</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- كارت الدعوة -->
+    <div class="invite-card glass card-enter" style="animation-delay:0.3s">
+      <div class="with-joy">بكل فرح وسرور</div>
+      <p class="main-text">يسعدنا أن نتشرف بحضوركم الكريم<br>حفل خطوبة ابنيهم الكريمين</p>
+      <div style="margin:1.2rem 0;display:flex;align-items:center;justify-content:center;gap:0.6rem;">
+        <span style="font-family:'Scheherazade New',serif;font-size:clamp(2rem,7vw,2.8rem);color:var(--text-dark);font-weight:700;">محمد</span>
+        <span style="font-size:1.8rem;animation:hb 1.8s ease infinite;display:inline-block;">💗</span>
+        <span style="font-family:'Scheherazade New',serif;font-size:clamp(2rem,7vw,2.8rem);color:var(--rose);font-weight:700;">أسماء</span>
+      </div>
+      <p class="main-text">ونسأل الله أن يبارك لهما ويبارك عليهما<br>ويجمع بينهما في خير</p>
+    </div>
+
+    <!-- التاريخ والموعد -->
+    <div class="details-grid">
+      <div class="detail-card glass card-enter" style="animation-delay:0.4s">
+        <span class="detail-icon">🌸</span>
+        <div class="detail-label">التاريخ</div>
+        <div class="detail-value date-num">٢٨ يونيو ٢٠٢٦</div>
+      </div>
+      <div class="detail-card glass card-enter" style="animation-delay:0.5s">
+        <span class="detail-icon">🕌</span>
+        <div class="detail-label">الموعد</div>
+        <div class="detail-value">مساءً<br><small style="color:var(--text-light);font-size:0.8rem;">28 / 6 / 2026</small></div>
+      </div>
+    </div>
+
+    <!-- المكان -->
+    <div class="location-card card-enter" style="animation-delay:0.55s">
+      <div class="location-top">
+        <span style="font-size:2.2rem;display:block;margin-bottom:0.4rem;">🏛️</span>
+        <div class="place-name">قاعة راجا</div>
+        <div class="place-sub">كوم حمادة — محافظة البحيرة</div>
+        <a class="map-btn" href="https://maps.app.goo.gl/bcNUypHczoja7g5S7" target="_blank">
+          📍 افتح في خرائط جوجل
+        </a>
+      </div>
+    </div>
+
+    <!-- العد التنازلي -->
+    <div class="countdown-card glass card-enter" style="animation-delay:0.65s">
+      <div class="countdown-title">⏳ العد التنازلي للحفل</div>
+      <div class="countdown-grid">
+        <div class="count-item"><div class="count-num" id="cd-days">00</div><div class="count-label">يوم</div></div>
+        <div class="count-item"><div class="count-num" id="cd-hours">00</div><div class="count-label">ساعة</div></div>
+        <div class="count-item"><div class="count-num" id="cd-mins">00</div><div class="count-label">دقيقة</div></div>
+        <div class="count-item"><div class="count-num" id="cd-secs">00</div><div class="count-label">ثانية</div></div>
+      </div>
+    </div>
+
+    <!-- آية -->
+    <div class="message-card glass card-enter" style="animation-delay:0.75s">
+      "وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا<br>لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً"
+      <div style="font-size:0.8rem;color:var(--text-light);margin-top:0.6rem;font-style:normal;">سورة الروم — ٢١</div>
+    </div>
+
+    <!-- واتساب -->
+    <button class="share-btn card-enter" style="animation-delay:0.85s" onclick="shareInvite()">
+      📲 شارك الدعوة على واتساب
+    </button>
+
+    <div class="invite-footer card-enter" style="animation-delay:0.95s">
+      <div class="footer-ornament">✦ ❦ ✦</div>
+      <p class="footer-text">في انتظار تشريفكم 💐</p>
+    </div>
+  </div>
+</div>
+
+<!-- MUSIC BAR -->
+<div id="music-bar" onclick="toggleMusic()">
+  <div class="music-icon" id="music-icon">🎵</div>
+  <div style="display:flex;flex-direction:column;">
+    <span class="music-title">ادخلي عمري</span>
+    <span class="music-artist">حسين الجاسمي</span>
+  </div>
+  <div class="music-waves">
+    <div class="wave-bar"></div><div class="wave-bar"></div>
+    <div class="wave-bar"></div><div class="wave-bar"></div>
+  </div>
+</div>
+
+<script>
+// ===== STARS =====
+const canvas=document.getElementById("stars-canvas");
+const ctx=canvas.getContext("2d");
+let stars=[];
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+function initStars(){
+  stars=[];
+  for(let i=0;i<220;i++) stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.8+0.3,speed:Math.random()*0.018+0.004,twinkle:Math.random()*Math.PI*2});
+}
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s=>{
+    s.twinkle+=s.speed;
+    const a=0.25+0.75*Math.abs(Math.sin(s.twinkle));
+    ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(255,240,200,${a})`;ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+resizeCanvas();initStars();drawStars();
+window.addEventListener("resize",()=>{resizeCanvas();initStars();});
+
+// ===== SPARKS =====
+(function(){
+  const wrap=document.getElementById("sparksWrap");
+  const colors=["#c9a96e","#f0ddb0","#d4896a","#e8c8a0","#ffffff"];
+  for(let i=0;i<30;i++){
+    const s=document.createElement("div");
+    s.className="spark";
+    const size=2+Math.random()*5;
+    s.style.cssText=`
+      left:${10+Math.random()*80}vw;
+      bottom:${Math.random()*60}vh;
+      width:${size}px;height:${size}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${2+Math.random()*4}s;
+      animation-delay:${Math.random()*5}s;
+    `;
+    wrap.appendChild(s);
+  }
+})();
+
+// ===== ENTER =====
+document.getElementById("enterBtn").addEventListener("click",function(){
+  const splash=document.getElementById("splash");
+  splash.classList.add("exiting");
+
+  // confetti
+  const colors=["#c9a96e","#d4896a","#b8c9b0","#f7c5b0","#e8d5b0","#ddb8d8"];
+  for(let i=0;i<80;i++){
+    setTimeout(()=>{
+      const c=document.createElement("div");c.className="confetti-piece";
+      c.style.cssText=`left:${20+Math.random()*60}vw;top:${10+Math.random()*40}vh;background:${colors[Math.floor(Math.random()*colors.length)]};width:${5+Math.random()*8}px;height:${5+Math.random()*8}px;border-radius:${Math.random()>0.5?"50%":"2px"};animation-duration:${2+Math.random()*2}s;`;
+      document.body.appendChild(c);setTimeout(()=>c.remove(),4500);
+    },i*25);
+  }
+
+  // flowers scatter
+  const flowers=["🌸","🌺","💮","🌷","💗","🌼","✨","⭐"];
+  for(let i=0;i<18;i++){
+    setTimeout(()=>{
+      const f=document.createElement("div");f.className="scatter";
+      f.textContent=flowers[Math.floor(Math.random()*flowers.length)];
+      f.style.cssText=`left:${5+Math.random()*90}vw;top:${5+Math.random()*80}vh;font-size:${1+Math.random()*1.5}rem;animation-duration:${2+Math.random()*1.5}s;`;
+      document.body.appendChild(f);setTimeout(()=>f.remove(),4000);
+    },i*70);
+  }
+
+  setTimeout(()=>{
+    splash.style.display="none";
+    document.getElementById("invite").classList.add("visible");
+    document.getElementById("music-bar").classList.add("visible");
+    startPetals();
+    setInterval(updateCountdown,1000);updateCountdown();
+    const audio=document.getElementById("bg-audio");
+    audio.volume=0.65;
+    audio.play().then(()=>{musicPlaying=true;updateMusicUI(true);}).catch(()=>{});
+  },900);
+});
+
+// ===== PETALS =====
+function startPetals(){
+  const emojis=["🌸","🌺","🌷","💮","🏵️","✿","🌼"];
+  setInterval(()=>{
+    const p=document.createElement("div");p.className="float-petal";
+    p.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    p.style.cssText=`left:${Math.random()*100}vw;animation-duration:${8+Math.random()*8}s;font-size:${0.9+Math.random()*0.9}rem;`;
+    document.body.appendChild(p);setTimeout(()=>p.remove(),18000);
+  },1000);
+}
+
+// ===== COUNTDOWN =====
+function updateCountdown(){
+  const diff=new Date("2026-06-28T20:00:00")-new Date();
+  if(diff<0){document.querySelector(".countdown-card").innerHTML="<div class='countdown-title'>🎉 مبروك الخطوبة!</div>";return;}
+  const set=(id,val)=>{
+    const el=document.getElementById(id);
+    const str=String(Math.floor(val)).padStart(2,"0");
+    if(el&&el.textContent!==str){el.classList.add("flip");el.textContent=str;setTimeout(()=>el.classList.remove("flip"),300);}
+  };
+  set("cd-days",diff/86400000);
+  set("cd-hours",(diff%86400000)/3600000);
+  set("cd-mins",(diff%3600000)/60000);
+  set("cd-secs",(diff%60000)/1000);
+}
+
+// ===== MUSIC =====
+const audio=document.getElementById("bg-audio");
+let musicPlaying=false;
+function toggleMusic(){
+  if(musicPlaying){audio.pause();musicPlaying=false;updateMusicUI(false);}
+  else{audio.play();musicPlaying=true;updateMusicUI(true);}
+}
+function updateMusicUI(p){
+  const icon=document.getElementById("music-icon");
+  document.querySelectorAll(".wave-bar").forEach(b=>p?b.classList.remove("paused"):b.classList.add("paused"));
+  p?icon.classList.add("playing"):icon.classList.remove("playing");
+}
+
+// ===== SHARE =====
+function shareInvite(){
+  const url=window.location.href;
+  const msg=`🌸 دعوة خطوبة مباركة 🌸\n\nعيلة سعد 💍 عيلة البحيري\nمحمد 💗 أسماء\n\n📅 28 يونيو 2026\n🏛️ قاعة راجا - كوم حمادة\n\n${url}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,"_blank");
+}
+</script>
+</body>
+</html>
